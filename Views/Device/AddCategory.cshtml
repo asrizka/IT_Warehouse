@@ -1,0 +1,51 @@
+﻿@model IT_Inventory.Models.ITW_Category
+@{
+}
+
+<a asp-controller="Device" asp-action="Device">
+    <i class="bi bi-box-arrow-left"></i>
+</a>
+
+<form id="categoryForm" method="post" asp-action="AddCategory">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="category_name">Category Name</label>
+                    <input asp-for="category_name" class="form-control" placeholder="Enter category name" />
+                    <span asp-validation-for="category_name" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="category_code">Category Code</label>
+                    <input asp-for="category_code" class="form-control" placeholder="Enter category code" />
+                    <span asp-validation-for="category_code" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- Separate Section for Created and Updated Info -->
+            <div class="form-row mt-4">
+                <div class="form-group col-md-6">
+                    <label for="created_at">Created At</label>
+                    <input asp-for="created_at" class="form-control" readonly />
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="created_by">Created By</label>
+                    <input asp-for="created_by" class="form-control" readonly />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="updated_at">Updated At</label>
+                    <input asp-for="updated_at" class="form-control" readonly />
+                </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="form-group">
+                <button type="submit" form="categoryForm" class="btn btn-primary">Save Category</button>
+            </div>
+        </div>
+    </div>
+</form>

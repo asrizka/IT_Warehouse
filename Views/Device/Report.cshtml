@@ -1,0 +1,113 @@
+﻿@model IEnumerable<ITW_Report>
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+<h2>Device Activity Report</h2>
+
+<!--filter-->
+<div class="dropdown mb-3">
+    <button class="btn btn-info dropdown-toggle mr-2" type="button" id="filterMenu" data-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-funnel"></i> Filter
+    </button>
+    <div class="dropdown-menu p-3">
+        <label for="dateRange">Date Range:</label>
+        <input type="text" id="dateRange" class="form-control" placeholder="Select date range" />
+    </div>
+</div>
+
+<table class="table table-sm table-hover table-bordered table-bg" id="reportTable">
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>Serial Number</th>
+            <th>Asset Tag</th>
+            <th>Device</th>
+            <th>Date</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int i = 1;
+        }
+        @foreach (var record in Model)
+        {
+            <tr>
+                <td>@i</td>
+                <td>@record.DetailSN</td>
+                <td>@record.DetailTag</td>
+                <td>@record.DeviceName</td>
+                <td>@(record.DateAndTime.HasValue ? record.DateAndTime.Value.ToString("dd/MM/yyyy HH:mm:ss") : "N/A")</td>
+                <td>@record.Status</td>
+            </tr>
+            i++;
+        }
+    </tbody>
+</table>
+
+@section scripts {
+    <!--datatables-->
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            var table = $('#reportTable').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        title: 'Device Activity Report',
+                        className: 'btn btn-success',
+                        text: '<i class="bi bi-file-earmark-excel"></i> Export to Excel'
+                    }
+                ],
+                paging: true,
+                searching: true,
+                autoWidth: true,
+                responsive: true,
+                pageLength: 50
+            });
+
+            // Initialize Date Range Picker
+            $('#dateRange').daterangepicker({
+                autoUpdateInput: false,
+                locale: {
+                    cancelLabel: 'Clear',
+                    format: 'DD/MM/YYYY'
+                }
+            });
+
+            // Apply filter when date range is selected
+            $('#dateRange').on('apply.daterangepicker', function (ev, picker) {
+                var startDate = picker.startDate.format('YYYY-MM-DD');
+                var endDate = picker.endDate.format('YYYY-MM-DD');
+
+                // Clear previous filters
+                $.fn.dataTable.ext.search.length = 0;
+
+                // Add new filter
+                $.fn.dataTable.ext.search.push(function (settings, data) {
+                    var date = moment(data[4], 'DD/MM/YYYY HH:mm:ss'); // Index of 'Date' column
+                    return date.isBetween(startDate, endDate, null, '[]');
+                });
+
+                table.draw();
+            });
+
+            // Clear filter when 'Clear' is clicked
+            $('#dateRange').on('cancel.daterangepicker', function () {
+                $(this).val('');
+                $.fn.dataTable.ext.search.length = 0; // Clear all filters
+                table.draw();
+            });
+        });
+    </script>
+}

@@ -1,0 +1,355 @@
+﻿@{
+}
+<div class="container mt-5">
+    <h2>Upload Dataset for Device Details</h2>
+
+    <!-- Guideline Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Follow this format to upload your data</h5>
+        </div>
+        <div class="card-body">
+            <p>Please ensure that your data follows this format:</p>
+            <ul>
+                <li><strong>Name:</strong> The name of the device (e.g., Dell Mouse, HP Laptop). It MUST match an existing device in the system!</li>
+                <li><strong>Tag:</strong> Unique tag for the device (e.g., IDM001).</li>
+                <li><strong>SN:</strong> Unique serial number for the device (e.g., 123456).</li>
+                <li><strong>Location:</strong> Location of the device (e.g., Shopfloor, Sukaasih).</li>
+                <li><strong>Note:</strong> Add additional note for the device if it's necessary (e.g., IP Address, Price?, terserahlah).</li>
+            </ul>
+            <a href="/Device/DetailTemplate" class="btn btn-info">Download Excel Template</a>
+        </div>
+    </div>
+
+    <!-- Upload Form -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Upload Your Excel File</h5>
+        </div>
+        <div class="card-body">
+            <form id="uploadExcelForm">
+                <div class="form-group">
+                    <label for="excelFile" class="font-weight-bold">Choose Excel File:</label>
+                    <input type="file" class="form-control-file" id="excelFile" name="excelFile" accept=".xlsx, .xls">
+                </div>
+                <button type="button" class="btn btn-primary" id="uploadButton">Upload</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Placeholder for showing uploaded data before submission -->
+    <div class="card mb-4" id="uploadedDataSection" style="display:none;">
+        <div class="card-header">
+            <h5>Preview Uploaded Data</h5>
+        </div>
+        <div class="card-body">
+            <!-- Display table of uploaded data -->
+            <div id="uploadedDataTable"></div>
+            <!-- Validation errors will be shown here -->
+            <div id="validationErrors" class="text-danger"></div>
+
+            <!-- Submit button -->
+            <button type="button" class="btn btn-success mt-3" id="submitAllButton" style="display:none;">Submit All</button>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    @* <script>
+        // Attach event listener for handling file upload
+        document.getElementById('uploadButton').addEventListener('click', function () {
+            var fileInput = document.getElementById('excelFile');
+            var file = fileInput.files[0];
+
+            if (!file) {
+                Swal.fire({ icon: 'warning', title: 'No file selected', text: 'Please select an Excel file.' });
+                return;
+            }
+
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var data = new Uint8Array(e.target.result);
+                var workbook = XLSX.read(data, { type: 'array' });
+                var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                var excelRows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+                if (excelRows.length === 0) {
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'No data found in the Excel sheet.' });
+                    return;
+                }
+
+                var html = "<table class='table'><thead><tr><th>Name</th><th>Tag</th><th>SN</th><th>Location</th><th>Note</th></tr></thead><tbody>";
+                var isValid = true;
+                var errors = [];
+                var dataToSubmit = [];
+
+                for (var i = 1; i < excelRows.length; i++) {
+                    var row = excelRows[i];
+
+                    if (row.length < 5 || !row[0] || !row[1] || !row[2] || !row[3] || !row[4]) {
+                        errors.push("Row " + (i + 1) + ": All fields must be filled.");
+                        isValid = false;
+                        continue;
+                    }
+
+                    html += "<tr><td>" + row[0] + "</td><td>" + row[1] + "</td><td>" + row[2] + "</td><td>" + row[3] + "</td><td>" + row[4] + "</td></tr>";
+                    dataToSubmit.push({
+                        device_name: String(row[0]), // Name
+                        detail_tag: String(row[1]),  // Tag
+                        detail_sn: String(row[2]),    // SN
+                        detail_location: String(row[3]),    // Lcoation
+                        note: String(row[4])    // Note/IP Address
+                    });
+                }
+
+                html += "</tbody></table>";
+                document.getElementById('uploadedDataTable').innerHTML = html;
+
+                if (!isValid) {
+                    document.getElementById('validationErrors').innerHTML = errors.join("<br>");
+                    Swal.fire({ icon: 'error', title: 'Validation Errors', html: errors.join('<br>') });
+                    document.getElementById('submitAllButton').style.display = 'none';
+                } else {
+                    document.getElementById('validationErrors').innerHTML = '';
+                    document.getElementById('submitAllButton').style.display = 'block';
+                }
+
+                document.getElementById('submitAllButton').addEventListener('click', function () {
+                    $.ajax({
+                    url: '/Device/SubmitAllDeviceDetails',
+                    type: 'POST',
+                    data: JSON.stringify(dataToSubmit),
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: response.message,
+                                timer: 1500,
+                                showConfirmButton: false
+                        }).then(() => {
+                            window.location.href = "/Device/DeviceDetail";
+                        });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Upload Failed',
+                                html: response.errors.join('<br>') // Show all server-side errors
+                            });
+                        }
+                    },
+                            error: function (error) {
+                                Swal.fire({ icon: 'error', title: 'Error', text: 'There was an error uploading the data.' });
+                            }
+                        });
+                    });
+                }
+
+                document.getElementById('uploadedDataSection').style.display = 'block';
+            };
+
+            reader.readAsArrayBuffer(file);
+        });
+    </script> *@
+    @* <script>
+    document.getElementById('uploadButton').addEventListener('click', function () {
+        var fileInput = document.getElementById('excelFile');
+        var file = fileInput.files[0];
+
+        if (!file) {
+            Swal.fire({ icon: 'warning', title: 'No file selected', text: 'Please select an Excel file.' });
+            return;
+        }
+
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var data = new Uint8Array(e.target.result);
+            var workbook = XLSX.read(data, { type: 'array' });
+            var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            var excelRows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+            if (excelRows.length === 0) {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'No data found in the Excel sheet.' });
+                return;
+            }
+
+            var html = "<table class='table'><thead><tr><th>Name</th><th>Tag</th><th>SN</th><th>Location</th><th>Note</th></tr></thead><tbody>";
+            var isValid = true;
+            var errors = [];
+            var dataToSubmit = [];
+
+            for (var i = 1; i < excelRows.length; i++) {
+                var row = excelRows[i];
+
+                if (row.length < 5 || !row[0] || !row[1] || !row[2] || !row[3] || !row[4]) {
+                    errors.push("Row " + (i + 1) + ": All fields must be filled.");
+                    isValid = false;
+                    continue;
+                }
+
+
+                html += "<tr><td>" + row[0] + "</td><td>" + row[1] + "</td><td>" + row[2] + "</td><td>" + row[3] + "</td><td>" + row[4] + "</td></tr>";
+                dataToSubmit.push({
+                    device_name: String(row[0]), // Name
+                    detail_tag: String(row[1]),  // Tag
+                    detail_sn: String(row[2]),   // SN
+                    detail_location: String(row[3]), // Location
+                    note: String(row[4]) // Note/IP Address
+                });
+            }
+
+            html += "</tbody></table>";
+            document.getElementById('uploadedDataTable').innerHTML = html;
+
+            if (!isValid) {
+                document.getElementById('validationErrors').innerHTML = errors.join("<br>");
+                Swal.fire({ icon: 'error', title: 'Validation Errors', html: errors.join('<br>') });
+                document.getElementById('submitAllButton').style.display = 'none';
+            } else {
+                document.getElementById('validationErrors').innerHTML = '';
+                document.getElementById('submitAllButton').style.display = 'block';
+            }
+
+            document.getElementById('submitAllButton').addEventListener('click', function () {
+                $.ajax({
+                    url: '/Device/SubmitAllDeviceDetails',
+                    type: 'POST',
+                    data: JSON.stringify(dataToSubmit),
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: response.message,
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                window.location.href = "/Device/DeviceDetail";
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Upload Failed',
+                                html: response.errors.join('<br>')
+                            });
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({ icon: 'error', title: 'Error', text: 'There was an error uploading the data.' });
+                    }
+                });
+            });
+
+            document.getElementById('uploadedDataSection').style.display = 'block';
+        };
+
+        reader.readAsArrayBuffer(file);
+    });
+</script> *@
+    <script>
+        document.getElementById('uploadButton').addEventListener('click', function () {
+            var fileInput = document.getElementById('excelFile');
+            var file = fileInput.files[0];
+
+            if (!file) {
+                Swal.fire({ icon: 'warning', title: 'No file selected', text: 'Please select an Excel file.' });
+                return;
+            }
+
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var data = new Uint8Array(e.target.result);
+                var workbook = XLSX.read(data, { type: 'array' });
+                var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                var excelRows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+                if (excelRows.length === 0) {
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'No data found in the Excel sheet.' });
+                    return;
+                }
+
+                var html = "<table class='table'><thead><tr><th>Name</th><th>Tag</th><th>SN</th><th>Location</th><th>Note</th></tr></thead><tbody>";
+                var isValid = true;
+                var errors = [];
+                var dataToSubmit = [];
+
+                for (var i = 1; i < excelRows.length; i++) {
+                    var row = excelRows[i];
+                    var deviceName = row[0];
+                    var detailTag = row[1];
+                    var detailSN = row[2];
+                    var detailLocation = row[3];
+                    var note = row[4];
+
+                    // Check if required fields (excluding detail_tag) are filled
+                    if (!deviceName || !detailSN) {
+                        errors.push("Row " + (i + 1) + ": Name and SN must be filled.");
+                        isValid = false;
+                        continue;
+                    }
+
+                    html += "<tr><td>" + deviceName + "</td><td>" + (detailTag || "") + "</td><td>" + detailSN + "</td><td>" + detailLocation + "</td><td>" + note + "</td></tr>";
+                    dataToSubmit.push({
+                        device_name: String(deviceName), // Name
+                        detail_tag: detailTag ? String(detailTag) : null,  // Tag (nullable)
+                        detail_sn: String(detailSN),   // SN
+                        detail_location: detailLocation ? String(detailLocation) : null, // Location
+                        note: note ? String(note) : null // Note/IP Address
+                    });
+                }
+
+                html += "</tbody></table>";
+                document.getElementById('uploadedDataTable').innerHTML = html;
+
+                if (!isValid) {
+                    document.getElementById('validationErrors').innerHTML = errors.join("<br>");
+                    Swal.fire({ icon: 'error', title: 'Validation Errors', html: errors.join('<br>') });
+                    document.getElementById('submitAllButton').style.display = 'none';
+                } else {
+                    document.getElementById('validationErrors').innerHTML = '';
+                    document.getElementById('submitAllButton').style.display = 'block';
+                }
+
+                document.getElementById('submitAllButton').addEventListener('click', function () {
+                    $.ajax({
+                        url: '/Device/SubmitAllDeviceDetails',
+                        type: 'POST',
+                        data: JSON.stringify(dataToSubmit),
+                        contentType: 'application/json; charset=utf-8',
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success',
+                                    text: response.message,
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    window.location.href = "/Device/DeviceDetail";
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Upload Failed',
+                                    html: response.errors.join('<br>')
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({ icon: 'error', title: 'Error', text: 'There was an error uploading the data.' });
+                        }
+                    });
+                });
+
+                document.getElementById('uploadedDataSection').style.display = 'block';
+            };
+
+            reader.readAsArrayBuffer(file);
+        });
+    </script>
+
+
+}

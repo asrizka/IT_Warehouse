@@ -1,0 +1,129 @@
+﻿@model List<IT_Inventory.Models.DeviceDetailView>
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
+
+<nav class="navbar navbar-light bg-light d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+        @* <!-- Categories -->
+        <div class="dropdown mr-2">
+            <button class="btn btn-info dropdown-toggle" type="button" id="categoryMenu" data-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-grid-1x2"></i>
+                Categories
+            </button>
+        </div> *@
+                
+        <!-- Add Item Button -->
+            <a class="btn btn-primary mr-2" type="button" asp-controller="Device" asp-action="AddDeviceDetail">
+            <i class="bi bi-plus-circle"></i>
+            Add Item
+        </a>
+
+        <!-- Upload -->
+        <a class="btn btn-success" type="button" asp-controller="Device" asp-action="UploadDetail">
+            <i class="bi bi-upload"></i>
+            Upload Dataset
+        </a>
+    </div>
+</nav>
+
+<!-- Content -->
+<div class="table-responsive">
+    <table class="table table-sm table-hover table-bordered table-bg" id="detailTable">
+        <thead>
+            <tr>
+                <th scope="col">No</th>
+                <th scope="col">Category</th>
+                <th scope="col">Type</th>
+                <th scope="col">Name</th>
+                <th scope="col">Tag</th>
+                <th scope="col">SN</th>
+                <th scope="col">Location</th>
+                <th scope="col">Note</th>
+                <th scope="col">Status</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int i = 1;
+            }
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@i</td>
+                    <td>@item.CategoryName</td>
+                    <td>@item.DeviceType</td>
+                    <td>@item.DeviceName</td>
+                    <td>@item.Detail.detail_tag</td>
+                    <td>@item.Detail.detail_sn</td>
+                    <td>@item.Detail.detail_location</td>
+                    <td>@item.Detail.note</td>
+                    <td>@item.Detail.detail_status</td>
+                    <td>
+                        <a class="btn btn-sm btn-primary" asp-controller="Device" asp-action="AddDeviceDetail" asp-route-id="@item.Detail.id_detail">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
+                        <a class="btn btn-sm btn-danger" asp-controller="Device" asp-action="DeleteDetail" asp-route-id="@item.Detail.id_detail" onclick="return confirm('Are you sure?')">
+                            <i class="bi bi-trash3"></i>
+                        </a>
+                    </td>
+                </tr>
+
+                i++;
+            }
+        </tbody>
+    </table>
+</div>
+
+@section scripts {
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+
+
+    <script>
+        $(document).ready(function () {
+            $('#detailTable').DataTable({
+                paging: true,
+                searching: true,
+                // ordering: true,
+                // info: true,
+                autoWidth: true,
+                responsive: true,
+                pageLength: 100,
+                // language: {
+                //     search: "Filter devices:" // Customizing the search placeholder
+                // },
+                // Custom layout positioning (dom)
+                // dom: '<"d-flex justify-content-between"lf>t<"d-flex justify-content-between"ip>',
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            // AJAX form submission
+            $('#addDeviceForm').on('submit', function (event) {
+                event.preventDefault(); // Prevent the form from reloading the page
+
+                var formData = $(this).serialize(); // Serialize the form data
+
+                $.ajax({
+                    type: 'POST',
+                    url: $(this).attr('action'), // Form action URL
+                    data: formData,
+                    success: function (response) {
+                        // If the response is successful, close the modal and reload the page or update the table
+                        $('#addDeviceModal').modal('hide');
+                        location.reload(); // Reload the page to update the table, or use AJAX to update the table dynamically
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle any errors here
+                        alert('An error occurred: ' + error);
+                    }
+                });
+            });
+        });
+    </script>
+
+}

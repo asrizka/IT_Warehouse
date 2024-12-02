@@ -1,0 +1,230 @@
+﻿@model List<IT_Inventory.Models.ITW_Request>
+@{
+    ViewBag.Title = "Request List";
+    var devices = ViewBag.Devices as IEnumerable<dynamic>;
+    // var users = (List<inventory.Models.ITW_User>)ViewBag.Users;
+    //ini ngapain lg coba, i mean it's not done yet but like im bored as hell
+}
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
+
+<nav class="navbar navbar-light bg-light d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+
+        @* <!-- Filter Button -->
+        <div class="dropdown">
+            <button class="btn btn-info dropdown-toggle mr-2" type="button" id="filterMenu" data-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-funnel"></i> Filter
+            </button>
+        </div> *@
+
+        <!-- Add Item Button -->
+        <a class="btn btn-primary" type="button" asp-controller="Transaction" asp-action="AddRequest">
+            <i class="bi bi-plus-circle"></i>
+            Add Request
+        </a>
+    </div>
+
+    <!-- Datetiem -->
+    <div id="clock-container" class="text-end pe-3">
+        <div id="date" style="font-size: 1rem;"></div>
+        <div id="clock" style="font-size: 1.5rem; font-weight: bold;"></div>
+    </div>
+</nav>
+
+
+<!-- Content -->
+<div class="table-responsive">
+    <table class="table table-sm table-hover table-bordered table-bg" id="requestTable">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col">No</th>
+                <th scope="col">NPP</th>
+                <th scope="col">Name</th>
+                <th scope="col">Device</th>
+                <th scope="col">date_borrowed</th>
+                <th scope="col">date_returned</th>
+                <th scope="col">Status</th>
+                <th scope="col">Admin</th>
+                <th scope="col">Note</th>
+               @*  <th scope="col">Action</th> *@
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int i = 1;
+            }
+            @foreach (var req in Model)
+            {
+                <tr>
+                    <td>@i</td>
+                    <td>@req.request_npp</td>
+                    <td>@req.request_name</td>
+                    <td>
+                        @{
+                            var device = devices.FirstOrDefault(d => d.id_detail == req.id_detail);
+                            if (device != null)
+                            {
+                                <span>@device.detail_tag - @device.device_name</span>
+                            }
+                        }
+                    </td>
+                    <td>@req.request_dateBorrowed.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>
+                        @if (req.request_dateReturned == null)
+                        {
+                            <button class="btn btn-sm" onclick="openReturnDateModal('@req.id_request')"><i class="bi bi-pencil-square"></i></button>
+                        }
+                        else
+                        {
+                            <span>@req.request_dateReturned.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                        }
+                    </td>
+                    <td>
+                        @if (req.request_status == "borrowed" || req.request_status == "used")
+                        {
+                            <span class="btn btn-danger">
+                                @if (req.request_status == "borrowed")
+                                {
+                                    @:Borrowed
+                                }
+                                else
+                                {
+                                    @:Used
+                                }
+                            </span>
+                        }
+                        else if (req.request_status == "returned" || req.request_status == "surplus")
+                        {
+                                <span class="btn btn-success">
+                                    @if (req.request_status == "returned")
+                                    {
+                                        @:Returned
+                                    }
+                                    else
+                                    {
+                                        @:Surplus
+                                    }
+                                </span>
+                        }
+                    </td>
+                    <td>@req.created_by</td>
+                    <td>@req.note</td>
+                    @* <td>
+                        <a class="btn btn-sm btn-primary" asp-controller="Transaction" asp-action="AddRequest" asp-route-id="@req.id_request"><i class="bi bi-pencil-square"></i></a>
+                        <a class="btn btn-sm btn-danger" asp-controller="Transaction" asp-action="DeleteReq" asp-route-id="@req.id_request" onclick="return confirm('Are you sure?')"><i class="bi bi-trash3"></i></a>
+                    </td> *@
+                </tr>
+
+                i++;
+            }
+        </tbody>
+    </table>
+    <!-- Return modal -->
+    <!-- Return Date Modal -->
+    <div class="modal fade" id="returnDateModal" tabindex="-1" role="dialog" aria-labelledby="returnDateModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="returnDateModalLabel">Set Return Date</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="returnDateForm">
+                    <div class="modal-body">
+                        <input type="hidden" id="requestIdInput" name="id_request" />
+                        <div class="form-group">
+                            <label for="returnDateInput">Return Date</label>
+                            <input type="datetime-local" class="form-control" id="returnDateInput" name="request_dateReturned" required />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#requestTable').DataTable({
+                paging: true,
+                searching: true,
+                autoWidth: true,
+                responsive: true,
+                pageLength: 10
+            });
+        });
+    </script>
+
+    <!--Datetime -->
+    <script>
+        function updateClock() {
+            //Indonesia timezone (WIB)
+            const optionsDate = {
+                timeZone: 'Asia/Jakarta',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+            const optionsTime = {
+                timeZone: 'Asia/Jakarta',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true 
+            };
+
+            const currentDate = new Intl.DateTimeFormat('en-US', optionsDate).format(new Date());
+            const currentTime = new Intl.DateTimeFormat('en-US', optionsTime).format(new Date());
+
+            document.getElementById('date').innerText = currentDate;
+            document.getElementById('clock').innerText = currentTime;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
+
+    <!--return date modal-->
+    <script>
+        function openReturnDateModal(idRequest) {
+            $('#requestIdInput').val(idRequest); // Set the request ID in the modal
+            $('#returnDateModal').modal('show'); // Show the modal
+        }
+
+        // Handle form submission
+        $('#returnDateForm').submit(function (e) {
+            e.preventDefault();
+
+            const id_request = $('#requestIdInput').val();
+            const request_dateReturned = $('#returnDateInput').val();
+
+            $.ajax({
+                url: '@Url.Action("UpdateReturnDate", "Transaction")',
+                type: 'POST',
+                data: { id_request, request_dateReturned },
+                success: function (response) {
+                    if (response.success) {
+                        alert('Return date updated successfully!');
+                        location.reload(); // Reload the page to reflect changes
+                    } else {
+                        alert(response.message || 'Failed to update return date.');
+                    }
+                },
+                error: function () {
+                    alert('An error occurred while updating the return date.');
+                }
+            });
+        });
+    </script>
+}

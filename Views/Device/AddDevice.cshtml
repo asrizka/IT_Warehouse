@@ -1,0 +1,138 @@
+﻿@model IT_Inventory.Models.ITW_Device
+@{
+    var categories = ViewBag.Categories as List<IT_Inventory.Models.ITW_Category>;
+}
+
+<a asp-controller="Device" asp-action="Device">
+    <i class="bi bi-box-arrow-left"></i>
+</a>
+
+<form id="addItemForm" method="post" asp-controller="Device" asp-action="AddDevice" asp-route-id="@Model.id_device">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="category">Category</label>
+                    <select asp-for="id_category" class="form-control" asp-items="ViewBag.Categories" id="categoryDropdown">
+                        <option align="center" value="">Select Category</option>
+                    </select>
+                    <span asp-validation-for="id_category" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="type">Type</label>
+                    <input asp-for="device_type" class="form-control">
+                    </input>
+                    <span asp-validation-for="device_type" id="device_type" placeholder="Enter type for this device" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-8">
+                    <label for="name">Name</label>
+                    <input asp-for="device_name" class="form-control" placeholder="Enter item name">
+                    <span asp-validation-for="device_name" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="device_eligibility">Eligibility</label>
+                    <select asp-for="device_eligibility" class="form-control">
+                        <option value="For Public">For Public</option>
+                        <option value="Not For Public">Not For Public</option>
+                </select>
+                    <span asp-validation-for="device_eligibility" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="createdBy">Created By</label>
+                        <input asp-for="created_by" class="form-control" placeholder="Enter creator's name">
+                        <span asp-validation-for="created_by"></span>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="createdDate">Created Date</label>
+                        <input asp-for="created_at" class="form-control" placeholder="Enter creation date">
+                        <span asp-validation-for="created_at"></span>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="updatedBy">Updated By</label>
+                        <input asp-for="updated_by" class="form-control" placeholder="Enter updater's name">
+                        <span asp-validation-for="updated_by"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" asp-controller="Device" asp-action="Device">Cancel</button>
+                <button type="submit" form="addItemForm" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<!-- Script -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+@* <script type="text/javascript">
+    $(document).ready(function () {
+        $('#serial_num, #tag').on('change', function () {
+            var serialNumber = $('#serial_num').val();
+            var device_tag = $('#device_tag').val();
+
+            // Make an AJAX call to check uniqueness
+            $.ajax({
+                url: '@Url.Action("CheckUniqueDevice", "Device")',
+                type: 'GET',
+                data: { serialNumber: serialNumber, device_tag: device_tag },
+                success: function (data) {
+                    if (data.serialExists) {
+                        alert('Serial number already exists. Please choose another.');
+                        $('#serial_num').focus(); // Move focus back to the serial number field
+                        return false;
+                    }
+                    if (data.tagExists) {
+                        alert('Tag already exists. Please choose another.');
+                        $('#device_tag').focus(); // Move focus back to the tag field
+                        return false;
+                    }
+                }
+            });
+        });
+    });
+</script> *@
+
+<!-- category_code -->
+@* <script>
+    document.getElementById('categoryDropdown').addEventListener('change', function () {
+        var selectedCategory = this.value;
+        var categoryCodes = @Html.Raw(Json.Serialize(ViewBag.category_codes)); // Get the category codes
+
+        // If a category is selected
+        if (selectedCategory) {
+            var code = categoryCodes[selectedCategory]; // Get the category code for the selected category
+
+            if (code) {
+                document.getElementById('tagCode').value = code; // Set the value of the tag code
+                document.getElementById('tagCode').disabled = true; // Disable the input
+            } else {
+                document.getElementById('tagCode').value = ''; // Clear the value if no category code exists
+                document.getElementById('tagCode').disabled = false; // Enable the input
+            }
+        } else {
+            document.getElementById('tagCode').value = ''; // Clear the value if no category is selected
+            document.getElementById('tagCode').disabled = false; // Enable the input
+        }
+    });
+
+    document.getElementById('addItemForm').addEventListener('submit', function () {
+        var tagCode = document.getElementById('tagCode').value;
+        var tagNumber = document.getElementById('tagNumber').value;
+        document.getElementById('hiddenTagCode').value = tagCode; // Pass tagCode to hidden input before submission
+        document.getElementById('hiddenTagNumber').value = tagNumber; // Pass tagNumber to hidden input before submission
+    });
+
+</script>
+ini add ke device detail
+ *@

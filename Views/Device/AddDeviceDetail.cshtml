@@ -1,0 +1,179 @@
+﻿@model IT_Inventory.Models.ITW_DeviceDetail
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+<a asp-controller="Device" asp-action="DeviceDetail">
+    <i class="bi bi-box-arrow-left"></i>
+</a>
+
+<form id="addDeviceDetailForm" method="post" asp-controller="Device" asp-action="AddDeviceDetail">
+    <input type="hidden" id="id_detail" name="id_detail" value="@Model?.id_detail" />
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <!-- Category Dropdown -->
+                <div class="form-group">
+                    <label for="categoryDropdown">Category</label>
+                    <select class="form-control" id="categoryDropdown">
+                        <option value="">Select Category</option>
+                        @foreach (var category in ViewBag.Categories)
+                        {
+                            bool isSelected = category.Value.ToString() == ViewBag.SelectedCategory?.ToString();
+                            <option value="@category.Value" selected="@(isSelected)">@category.Text</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Type Dropdown -->
+                <div class="form-group">
+                    <label for="typeDropdown">Type</label>
+                    <select class="form-control" id="typeDropdown">
+                        <option value="">Select Type</option>
+                        <!-- Options will be populated based on category -->
+                    </select>
+                </div>
+
+                <!-- Device Dropdown -->
+                <div class="form-group">
+                    <label for="deviceDropdown">Device</label>
+                    <select asp-for="id_device" class="form-control" id="deviceDropdown">
+                        <option value="">Select Device</option>
+                        <!-- Options will be populated based on category and type -->
+                    </select>
+                    <span asp-validation-for="id_device" class="text-danger"></span>
+                </div>
+
+                <!-- Detail Tag and Serial Number -->
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="detail_tag">Asset Tag</label>
+                        <input asp-for="detail_tag" class="form-control" id="detail_tag" placeholder="Enter asset tag">
+                        <span asp-validation-for="detail_tag" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        <label for="serial_number">Serial Number</label>
+                        <input asp-for="detail_sn" class="form-control" id="serial_num" placeholder="Enter serial number">
+                        <span asp-validation-for="detail_sn" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Location and Note -->
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="detail_location">Location</label>
+                        <input asp-for="detail_location" class="form-control" id="detail_location" placeholder="Enter the location of the device">
+                        <span asp-validation-for="detail_location" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        <label for="note">Note</label>
+                        <input asp-for="note" class="form-control" id="note" placeholder="Add note for the device (e.g. IP Address)">
+                        <span asp-validation-for="note" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary">Cancel</button>
+                    <button id="submit_button" type="submit" form="addDeviceDetailForm" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+    <script>
+    $(document).ready(function () {
+        // Store category-device data from the server
+        var categoryDevices = @Html.Raw(Json.Serialize(ViewBag.CategoryDevices));
+        var selectedCategory = '@ViewBag.SelectedCategory';
+        var selectedType = '@ViewBag.SelectedType';
+        var selectedDevice = '@ViewBag.SelectedDevice';
+
+        // Function to populate the Type dropdown
+        function populateTypes(categoryId) {
+            $('#typeDropdown').empty().append('<option value="">Select Type</option>');
+            var types = [...new Set(categoryDevices[categoryId]?.map(d => d.device_type))];
+            types.forEach(function (type) {
+                $('#typeDropdown').append(new Option(type, type));
+            });
+        }
+
+        // Function to populate the Device dropdown
+        function populateDevices(categoryId, selectedType) {
+            $('#deviceDropdown').empty().append('<option value="">Select Device</option>');
+            var devices = categoryDevices[categoryId]?.filter(d => d.device_type === selectedType) || [];
+            devices.forEach(function (device) {
+                $('#deviceDropdown').append(new Option(device.device_name, device.id_device));
+            });
+        }
+
+        // Initialize dropdowns if editing
+        if (selectedCategory) {
+            $('#categoryDropdown').val(selectedCategory);
+            populateTypes(selectedCategory);
+
+            if (selectedType) {
+                $('#typeDropdown').val(selectedType);
+                populateDevices(selectedCategory, selectedType);
+                $('#deviceDropdown').val(selectedDevice);
+            }
+        }
+
+        // Populate Types and Devices on Category change
+        $('#categoryDropdown').on('change', function () {
+            var selectedCategoryId = $(this).val();
+            $('#typeDropdown').empty().append('<option value="">Select Type</option>');
+            $('#deviceDropdown').empty().append('<option value="">Select Device</option>');
+
+            if (selectedCategoryId) {
+                populateTypes(selectedCategoryId);
+            }
+        });
+
+        // Populate Devices on Type change
+        $('#typeDropdown').on('change', function () {
+            var selectedCategoryId = $('#categoryDropdown').val();
+            var selectedType = $(this).val();
+            $('#deviceDropdown').empty().append('<option value="">Select Device</option>');
+
+            if (selectedCategoryId && selectedType) {
+                populateDevices(selectedCategoryId, selectedType);
+            }
+        });
+
+        // Submit button event for uniqueness check and form submission
+        $('#submit_button').on('click', function (e) {
+            e.preventDefault();
+
+            var serialNumber = $('#serial_num').val().trim();
+            var deviceTag = $('#detail_tag').val().trim();
+
+            // Basic validation for empty fields
+            if (!serialNumber) {
+                alert("Please fill in the Serial Number.");
+                return;
+            }
+
+            // Perform unique check before submitting
+            let idDetail = $('#id_detail').val(); // Retrieve id_detail if editing, assume you have a hidden input for this
+            $.get('/Device/CheckUniqueDevice', { serialNumber: serialNumber, device_tag: deviceTag, id_detail: idDetail })
+                .done(function (data) {
+                    if (data.sn_exist || data.tag_exist) {
+                        alert("Serial Number or Asset Tag must be unique.");
+                    } else {
+                        $('#addDeviceDetailForm').submit();
+                    }
+                })
+                .fail(function () {
+                    alert("Error checking uniqueness. Please try again.");
+                });
+        });
+    });
+</script>
+}

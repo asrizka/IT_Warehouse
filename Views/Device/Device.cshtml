@@ -1,0 +1,183 @@
+﻿@* @model IT_Inventory.Models.ITW_Device
+ *@
+@{
+    var devices = ViewBag.Device as List<IT_Inventory.Models.ITW_Device>;
+    var categories = ViewBag.Category as List<IT_Inventory.Models.ITW_Category>;
+    var selectedCategories = ViewBag.SelectedCategories as List<int> ?? new List<int>();
+}
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
+
+
+
+
+<nav class="navbar navbar-light bg-light d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+
+        <!-- Categories -->
+        <form method="get" asp-controller="Device" asp-action="Device">
+            <div class="dropdown mr-2">
+                <button class="btn btn-info dropdown-toggle" type="button" id="categoryMenu" data-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-grid-1x2"></i>
+                    Categories
+                </button>
+                <div class="dropdown-menu" aria-labelledby="categoryMenu">
+                    @foreach (var category in categories)
+                    {
+                        <div class="d-flex justify-content-between align-items-center dropdown-item">
+                            <div class="form-check flex-grow-1 text-truncate">
+                                <input class="form-check-input" type="checkbox" id="checkbox@category.id_category" name="selectedCategories" value="@category.id_category"
+                                       onchange="this.form.submit()"
+                                @(selectedCategories != null && selectedCategories.Contains(category.id_category) ? "checked" : "")>
+                                <label class="form-check-label" for="checkbox@category.id_category">
+                                    @category.category_name
+                                </label>
+                            </div>
+
+                            <div class="ms-2">
+                                <a class="text-danger ms-2" asp-controller="Device" asp-action="DeleteCategory" asp-route-id="@category.id_category" onclick="return confirm('Are you sure?')">
+                                    <i class="bi bi-x-lg"></i>
+                                </a>
+                                <a href="@Url.Action("AddCategory", "Device", new { id = category.id_category })" class="text-primary">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item active" class="btn btn-primary" asp-controller="Device" asp-action="AddCategory">Add New Category</a>
+                </div>
+            </div>
+        </form>
+
+        <!-- Add Item Button (modified to trigger modal) -->
+        <a class="btn btn-primary mr-2" type="button" asp-controller="Device" asp-action="AddDevice">
+            <i class="bi bi-plus-circle"></i>
+            Add Item
+        </a>
+
+        <!-- Upload -->
+        <a class="btn btn-success" type="button" asp-controller="Device" asp-action="Upload">
+            <i class="bi bi-upload"></i>
+            Upload Dataset
+        </a>
+        </>
+</nav>
+
+<!-- Content -->
+<div class="table-responsive">
+    <table class="table table-sm table-hover table-bordered table-bg" id="deviceTable">
+        <thead>
+            <tr>
+                <th scope="col">No</th>
+                <th scope="col">Category</th>
+                <th scope="col">Type</th>
+                <th scope="col">Name</th>
+                <th scope="col">Eligibility</th>
+                <th scope="col">Qty</th>
+                <th scope="col">Available</th>
+                <th scope="col">Borrowed</th>
+                <th scope="col">Used</th>
+                <th scope="col">On Hold</th>
+                <th scope="col">Disposed</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int i = 1;
+            }
+            @foreach (var device in devices)
+            {
+                var category = categories.FirstOrDefault(c => c.id_category == device.id_category);
+                <tr>
+                    <td>@i</td>
+                    <td>@category.category_name</td>
+                    <td>@device.device_type</td>
+                    <td>@device.device_name</td>
+                    <td>@device.device_eligibility</td>
+                    <td>@device.qty_total</td>
+                    <td>@device.qty_available</td>
+                    <td>@device.qty_borrowed</td>
+                    <td>@device.qty_used</td>
+                    <td>@device.qty_disposed</td>
+                    <td>@device.qty_disposed</td>
+                    <td>
+                        <a class="btn btn-sm btn-primary" asp-controller="Device" asp-action="AddDevice" asp-route-id="@device.id_device">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
+                        <a class="btn btn-sm btn-danger" asp-controller="Device" asp-action="Delete" asp-route-id="@device.id_device" onclick="return confirm('Are you sure?')">
+                            <i class="bi bi-trash3"></i>
+                        </a>
+                    </td>
+                </tr>
+
+                i++;
+            }
+        </tbody>
+    </table>
+</div>
+
+@section scripts {
+
+    @* <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/2.1.6/js/dataTables.min.js"></script>*@
+
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+    <script>
+
+        // $(document).ready(function () {
+        //     $("#deviceTable").dataTable({
+        //         searching: false,
+        //         info: false,
+        //         lengthChange: false,
+        //         responsive: true,
+        //         autoWidth: false,
+        //         oLanguage: {
+        //             oPaginate: {
+        //                 sNext: 'Next <i class="fas fa-angle-double-right"></i>',
+        //                 sPrevious: '<i class="fas fa-angle-double-left"></i> Previous'
+        //             }
+        //         },
+        //         iDisplayLength: 5,
+        //         responsive: {
+        //             pagingType: "simple"
+        //         }
+        //     });
+        // });
+        // $(document).ready(function () {
+        //     $('#deviceTable').DataTable({
+        //         "paging": true,
+        //         "lengthChange": true,
+        //         "searching": true,
+        //         "ordering": true,
+        //         "ordering": true,
+        //         "info": true,
+        //         "autoWidth": false,
+        //         "responsive": true
+        //     });
+        // });
+        $(document).ready(function () {
+            $('#deviceTable').DataTable({
+                paging: true,
+                searching: true,
+                // ordering: true,
+                // info: true,
+                autoWidth: true,
+                responsive: true,
+                pageLength: 100,
+                // language: {
+                //     search: "Filter devices:" // Customizing the search placeholder
+                // },
+                // Custom layout positioning (dom)
+                // dom: '<"d-flex justify-content-between"lf>t<"d-flex justify-content-between"ip>',
+            });
+        });
+    </script>
+
+}

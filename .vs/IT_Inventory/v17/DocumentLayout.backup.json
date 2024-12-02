@@ -1,0 +1,126 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\internship\\IT_Inventory\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{C20FBEA3-1B57-458A-A58E-B008278033F9}|IT_Inventory.csproj|d:\\internship\\it_inventory\\views\\device\\report.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{C20FBEA3-1B57-458A-A58E-B008278033F9}|IT_Inventory.csproj|solutionrelative:views\\device\\report.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C20FBEA3-1B57-458A-A58E-B008278033F9}|IT_Inventory.csproj|d:\\internship\\it_inventory\\views\\transaction\\request.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{C20FBEA3-1B57-458A-A58E-B008278033F9}|IT_Inventory.csproj|solutionrelative:views\\transaction\\request.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C20FBEA3-1B57-458A-A58E-B008278033F9}|IT_Inventory.csproj|d:\\internship\\it_inventory\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{C20FBEA3-1B57-458A-A58E-B008278033F9}|IT_Inventory.csproj|solutionrelative:views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C20FBEA3-1B57-458A-A58E-B008278033F9}|IT_Inventory.csproj|d:\\internship\\it_inventory\\views\\device\\upload.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{C20FBEA3-1B57-458A-A58E-B008278033F9}|IT_Inventory.csproj|solutionrelative:views\\device\\upload.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C20FBEA3-1B57-458A-A58E-B008278033F9}|IT_Inventory.csproj|d:\\internship\\it_inventory\\views\\device\\devicedetail.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{C20FBEA3-1B57-458A-A58E-B008278033F9}|IT_Inventory.csproj|solutionrelative:views\\device\\devicedetail.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C20FBEA3-1B57-458A-A58E-B008278033F9}|IT_Inventory.csproj|d:\\internship\\it_inventory\\controllers\\devicecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C20FBEA3-1B57-458A-A58E-B008278033F9}|IT_Inventory.csproj|solutionrelative:controllers\\devicecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Request.cshtml",
+              "DocumentMoniker": "D:\\internship\\IT_Inventory\\Views\\Transaction\\Request.cshtml",
+              "RelativeDocumentMoniker": "Views\\Transaction\\Request.cshtml",
+              "ToolTip": "D:\\internship\\IT_Inventory\\Views\\Transaction\\Request.cshtml",
+              "RelativeToolTip": "Views\\Transaction\\Request.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-12-02T07:19:15.75Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Upload.cshtml",
+              "DocumentMoniker": "D:\\internship\\IT_Inventory\\Views\\Device\\Upload.cshtml",
+              "RelativeDocumentMoniker": "Views\\Device\\Upload.cshtml",
+              "ToolTip": "D:\\internship\\IT_Inventory\\Views\\Device\\Upload.cshtml",
+              "RelativeToolTip": "Views\\Device\\Upload.cshtml",
+              "ViewState": "AgIAACsAAAAAMTMzMzMLwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-12-02T07:14:52.656Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Report.cshtml",
+              "DocumentMoniker": "D:\\internship\\IT_Inventory\\Views\\Device\\Report.cshtml",
+              "RelativeDocumentMoniker": "Views\\Device\\Report.cshtml",
+              "ToolTip": "D:\\internship\\IT_Inventory\\Views\\Device\\Report.cshtml",
+              "RelativeToolTip": "Views\\Device\\Report.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-12-02T06:58:13.634Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "DeviceDetail.cshtml",
+              "DocumentMoniker": "D:\\internship\\IT_Inventory\\Views\\Device\\DeviceDetail.cshtml",
+              "RelativeDocumentMoniker": "Views\\Device\\DeviceDetail.cshtml",
+              "ToolTip": "D:\\internship\\IT_Inventory\\Views\\Device\\DeviceDetail.cshtml",
+              "RelativeToolTip": "Views\\Device\\DeviceDetail.cshtml",
+              "ViewState": "AgIAAAIAAABAMzMzMzMrwAsAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-12-02T06:41:09.164Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "DeviceController.cs",
+              "DocumentMoniker": "D:\\internship\\IT_Inventory\\Controllers\\DeviceController.cs",
+              "RelativeDocumentMoniker": "Controllers\\DeviceController.cs",
+              "ToolTip": "D:\\internship\\IT_Inventory\\Controllers\\DeviceController.cs",
+              "RelativeToolTip": "Controllers\\DeviceController.cs",
+              "ViewState": "AgIAAO0BAACAYWZmZmYWwAYCAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-18T22:29:16.068Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "D:\\internship\\IT_Inventory\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "D:\\internship\\IT_Inventory\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAANgAAAAAAAAAAABwvYEAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-11-18T09:07:51.297Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

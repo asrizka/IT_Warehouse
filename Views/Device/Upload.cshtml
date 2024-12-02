@@ -1,0 +1,189 @@
+﻿@{
+}
+
+<div class="container mt-5">
+    <h2>Upload Dataset for Devices</h2>
+
+    <!-- Guideline Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Follow this format to upload your data</h5>
+        </div>
+        <div class="card-body">
+            <p>Please ensure that your data follows this format:</p>
+            <ul>
+                <li><strong>Category:</strong> The category of the device (e.g., Laptop, Mouse). Make sure it exists!</li>
+                <li><strong>Type:</strong> The type of the device (e.g., Wireless, Latitude 5420).</li>
+                <li><strong>Name:</strong> The name of the device (e.g., Dell Mouse, HP).</li>
+                <li><strong>Eligibility:</strong> The eligibility status (e.g., For Public or Not For Public).</li>
+            </ul>
+            <a href="/Device/DeviceTemplate" class="btn btn-info">Download Excel Template</a>
+        </div>
+    </div>
+
+    <!-- Upload Form -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Upload Your Excel File</h5>
+        </div>
+        <div class="card-body">
+            <form id="uploadExcelForm">
+                <div class="form-group">
+                    <label for="excelFile" class="font-weight-bold">Choose Excel File:</label>
+                    <input type="file" class="form-control-file" id="excelFile" name="excelFile" accept=".xlsx, .xls">
+                </div>
+                <button type="button" class="btn btn-primary" id="uploadButton">Upload</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Placeholder for showing uploaded data before submission -->
+    <div class="card mb-4" id="uploadedDataSection" style="display:none;">
+        <div class="card-header">
+            <h5>Preview Uploaded Data</h5>
+        </div>
+        <div class="card-body">
+            <!-- Display table of uploaded data -->
+            <div id="uploadedDataTable"></div>
+            <!-- Validation errors will be shown here -->
+            <div id="validationErrors" class="text-danger"></div>
+
+            <!-- Submit button -->
+            <button type="button" class="btn btn-success mt-3" id="submitAllButton" style="display:none;">Submit All</button>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script>
+        function handleFileUpload() {
+            console.log("Upload button clicked");
+
+            var fileInput = document.getElementById('excelFile');
+            var file = fileInput.files[0];
+
+            if (!file) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No file selected',
+                    text: 'Please select an Excel file before uploading.'
+                });
+                console.log("No file selected");
+                return;
+            }
+
+            console.log("File selected: " + file.name);
+
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                console.log("File loaded successfully");
+
+                var data = new Uint8Array(e.target.result);
+                var workbook = XLSX.read(data, { type: 'array' });
+
+                console.log(workbook); // Check the workbook content
+
+                // Assuming the first worksheet
+                var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                var excelRows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+                // Check if the first row has headers
+                if (excelRows.length === 0) {
+                    console.error("No data found in the sheet.");
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No data found in the Excel sheet.'
+                    });
+                    return;
+                }
+
+                // Perform validation and render data for user review
+                var html = "<table class='table'><thead><tr><th>Category</th><th>Type</th><th>Name</th><th>Eligibility</th></tr></thead><tbody>";
+                var isValid = true;
+                var errors = [];
+                var dataToSubmit = [];
+
+                for (var i = 1; i < excelRows.length; i++) { // Start from row 2 to skip headers
+                    var row = excelRows[i];
+
+                    // Ensure the row has at least 4 columns
+                    if (row.length < 4 || !row[0] || !row[1] || !row[2] || !row[3]) {
+                        errors.push("Row " + (i + 1) + ": All fields must be filled.");
+                        isValid = false;
+                        continue;
+                    }
+
+                    html += "<tr><td>" + row[0] + "</td><td>" + row[1] + "</td><td>" + row[2] + "</td><td>" + row[3] + "</td></tr>";
+
+                    // Push validated data for submission
+                    dataToSubmit.push({
+                        device_type: row[1],
+                        device_name: row[2],
+                        device_eligibility: row[3],
+                        category_name: row[0]
+                    });
+                }
+
+                html += "</tbody></table>";
+                document.getElementById('uploadedDataTable').innerHTML = html;
+
+                // Show validation errors if any
+                if (!isValid) {
+                    document.getElementById('validationErrors').innerHTML = errors.join("<br>");
+                    document.getElementById('submitAllButton').style.display = 'none';
+                    console.log("Validation errors: ", errors);
+                } else {
+                    document.getElementById('validationErrors').innerHTML = '';
+                    document.getElementById('submitAllButton').style.display = 'block';
+
+                    // Store validated data in a hidden element or variable for submission
+                    document.getElementById('submitAllButton').addEventListener('click', function () {
+                        $.ajax({
+                            url: '/Device/SubmitAllDevices', // Your submit route
+                            type: 'POST',
+                            data: JSON.stringify(dataToSubmit),
+                            contentType: 'application/json; charset=utf-8',
+                            success: function (response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Success!',
+                                        text: response.message
+                                    }).then(function () {
+                                        window.location.href = '/Device/Device'; // Redirect on success
+                                    });
+                                } else if (response.errors && response.errors.length > 0) {
+                                    // Show all errors in one SweetAlert
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Validation Errors',
+                                        html: response.errors.join('<br>') // Display all errors
+                                    });
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'An error occurred',
+                                    text: error
+                                });
+                            }
+                        });
+                    });
+                }
+
+                // Show the uploaded data section
+                document.getElementById('uploadedDataSection').style.display = 'block';
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Attach event listener after the DOM is ready
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('uploadButton').addEventListener('click', handleFileUpload);
+        });
+    </script>
+}

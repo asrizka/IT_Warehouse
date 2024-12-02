@@ -1,0 +1,47 @@
+﻿@model IT_Inventory.Models.ITW_User
+@{
+}
+
+<a asp-controller="User" asp-action="User">
+    <i class="bi bi-box-arrow-left"></i>
+</a>
+<form id="addUserForm" method="post" asp-action="AddUser">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- User Name -->
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input asp-for="user_name" class="form-control" placeholder="Enter user name" required>
+            </div>
+
+            <!-- Role -->
+            <div class="form-group">
+                <label for="role">Role</label>
+                <input asp-for="user_role" class="form-control" placeholder="Enter user role" required>
+            </div>
+
+            <!-- Created By -->
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="created_by">Created By</label>
+                    <input asp-for="created_by" class="form-control" placeholder="Enter creator's name">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="created_at">Created Date</label>
+                    <input asp-for="created_at" class="form-control" placeholder="Enter creation date" type="datetime-local">
+                </div>
+            </div>
+
+            <!-- Updated At -->
+            <div class="form-group">
+                <label for="updated_at">Updated Date</label>
+                <input asp-for="updated_at" class="form-control" placeholder="Enter update date" type="datetime-local">
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary">Cancel</button>
+                <button type="submit" form="addUserForm" class="btn btn-primary">Save User</button>
+            </div>
+        </div>
+    </div>
+</form>

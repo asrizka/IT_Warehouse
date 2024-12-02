@@ -1,0 +1,80 @@
+﻿@model List<IT_Inventory.Models.ITW_User>
+@{
+}
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
+
+<nav class="navbar navbar-light bg-light d-flex justify-content-between align-items-center">
+
+    <!-- Left Aligned Buttons -->
+    <div class="d-flex align-items-center">
+        <!-- Add Item Button -->
+        <a class="btn btn-primary" type="button" asp-controller="User" asp-action="AddUser">
+            <i class="bi bi-plus-circle"></i>
+            Add User
+        </a>
+        <!-- End of Add Item Button -->
+    </div>
+
+</nav>
+
+
+<!-- Content -->
+<div class="table-responsive">
+    <table class ="table table-sm table-hover table-bordered table-bg" id="userTable">
+    <thead>
+        <tr>
+            <th scope="col">No</th>
+            <th scope="col">Name</th>
+            <th scope="col">Role</th>
+            <th scope="col">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+            @{
+                int i = 1;
+            }
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@i</td>
+                @* <td>Category here</td> ini juga oi bentar lagi pulang lesgooo*@
+                <td>@user.user_name</td>
+                <td>@user.user_role</td>
+                <td>
+                    <a class="btn btn-sm btn-primary" asp-controller="User" asp-action="AddUser" asp-route-id="@user.id_user"><i class="bi bi-pencil-square"></i></a>
+                    <a class="btn btn-sm btn-danger" asp-controller="User" asp-action="DeleteUser" asp-route-id="@user.id_user" oneclick="return confirm('Are you sure?')"><i class="bi bi-trash3"></i></a>
+                </td>
+            </tr>
+
+            i++;
+        }
+    </tbody>
+</table>
+</div>
+
+@section scripts{
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#userTable').DataTable({
+                paging: true,
+                searching: true,
+                // ordering: true,
+                // info: true,
+                autoWidth: true,
+                responsive: true,
+                pageLength: 100,
+                // language: {
+                //     search: "Filter devices:" // Customizing the search placeholder
+                // },
+                // Custom layout positioning (dom)
+                // dom: '<"d-flex justify-content-between"lf>t<"d-flex justify-content-between"ip>',
+            });
+        });
+    </script>
+}

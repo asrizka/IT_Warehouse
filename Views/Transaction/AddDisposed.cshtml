@@ -1,0 +1,111 @@
+﻿@model IT_Inventory.Models.ITW_Disposal
+@{
+}
+
+<a asp-controller="Transaction" asp-action="Disposed">
+    <i class="bi bi-box-arrow-left"></i>
+</a>
+
+<form id="disposedItemForm" method="post" asp-controller="Transaction" asp-action="AddDisposed" enctype="multipart/form-data">
+    <input type="hidden" id="id_disposal" name="id_disposal" value="@Model?.id_disposal" />
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            <div class="row">
+                <!-- Type -->
+                @* <div class="form-group col-md-6">
+                    <label for="deviceType">Device Type</label>
+                    <select id="deviceType" class="form-control" asp-items="ViewBag.DeviceType">
+                        <option align="center" value="">Select Type</option>
+                    </select>
+                </div>
+
+                <!-- tag+device_name -->
+                <div class="form-group col-md-6">
+                    <label for="id_detail">Mau buang paan</label>
+                    <select asp-for="id_detail" class="form-control" asp-items="ViewBag.Devices" id="deviceDropdown">
+                        <option align="center" value="">Select Device</option>
+                    </select>
+                </div> *@
+                <div class="form-group col-md-6">
+                    <label for="deviceType">Device Type</label>
+                    <select id="deviceType" class="form-control" asp-items="ViewBag.DeviceType">
+                        <option align="center" value="">Select Type</option>
+                    </select>
+                </div>
+
+                <div class="form-group col-md-6">
+                    <label for="id_detail">Device Name</label>
+                    <select asp-for="id_detail" class="form-control" asp-items="ViewBag.Devices" id="deviceDropdown">
+                        <option align="center" value="">Select Device</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <!-- Date, Certificate, Documentation -->
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="date">Date</label>
+                    <input asp-for="disposal_date" type="date" class="form-control" placeholder="Enter date">
+                    <span asp-validation-for="disposal_date" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="certificateFile">Certificate</label>
+                    <input asp-for="certificateFile" type="file" class="form-control-file">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="documentationFile">Documentation</label>
+                    <input asp-for="documentationFile" type="file" class="form-control-file">
+                </div>
+            </div>
+
+            <!-- Note -->
+            <div class="form-row">
+                <div class="form-group col-md-8">
+                    <label for="note">Note</label>
+                    <textarea asp-for="note" class="form-control" placeholder="Enter note"></textarea>
+                    <span asp-validation-for="note" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- Form Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary">Cancel</button>
+                <button type="submit" form="disposedItemForm" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- script -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const deviceTypeDropdown = document.getElementById('deviceType');
+        const deviceDropdown = document.getElementById('deviceDropdown');
+
+        deviceTypeDropdown.addEventListener('change', function () {
+            const selectedType = this.value;
+            if (selectedType) {
+                fetch(`/Transaction/GetDevicesByType?deviceTypes=${selectedType}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
+                    .then(data => {
+                        deviceDropdown.innerHTML = '<option value="">Select Device</option>'; // Reset dropdown
+                        data.forEach(device => {
+                            const option = document.createElement('option');
+                            option.value = device.id_detail;
+                            option.textContent = device.display;
+                            deviceDropdown.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching devices:', error));
+            } else {
+                deviceDropdown.innerHTML = '<option value="">Select Device</option>';
+            }
+        });
+    });     
+</script>

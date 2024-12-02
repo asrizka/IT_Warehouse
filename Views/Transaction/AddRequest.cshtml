@@ -1,0 +1,187 @@
+﻿@model IT_Inventory.Models.ITW_Request
+@{
+}
+
+<a asp-controller="Transaction" asp-action="Request" class="btn btn-secondary mb-3">
+    <i class="bi bi-box-arrow-left"></i> Back to Requests
+</a>
+
+<form id="addRequestForm" method="post" asp-action="AddRequest" asp-route-id="@Model.id_request">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- User -->
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <label for="request_npp">NPP</label>
+                    <input asp-for="request_npp" class="form-control" placeholder="Enter NPP"/>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="request_name">Name</label>
+                    <input asp-for="request_name" class="form-control" placeholder="Enter Name"/>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Type -->
+                <div class="form-group col-md-6">
+                    <label for="deviceType">Type</label>
+                    <select id="deviceType" class="form-control" asp-items="ViewBag.DeviceType">
+                        <option align="center" value="">Select Type</option>
+                    </select>
+                </div>
+
+                <!-- tag+device_name -->
+                <div class="form-group col-md-6">
+                    <label for="id_detail">Device Name</label>
+                    <select asp-for="id_detail" class="form-control" asp-items="ViewBag.Devices" id="deviceDropdown">
+                        <option align="center" value="">Select Device</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Date Borrowed and Rental Period -->
+            <div class="row">
+                <div class="form-group col-md-4">
+                    <label for="request_dateBorrowed">Date Borrowed</label>
+                    <input asp-for="request_dateBorrowed" class="form-control" />
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="request_period">Rental Period</label>
+                    <input asp-for="request_period" class="form-control" placeholder="Enter duration (days)" />
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="request_dateReturned">Date Returned</label>
+                    <input asp-for="request_dateReturned" class="form-control" />
+                </div>
+            </div>
+
+
+            <!-- Status and Note -->
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="request_status">Status</label>
+                    <select asp-for="request_status" class="form-control">
+                        <option value="borrowed">borrowed</option>
+                        <option value="used">used</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="note">Note</label>
+                    <input asp-for="note" class="form-control" rows="3" placeholder="Enter any notes (optional)"></input>
+                </div>
+                @* <div class="form-group col-md-6">
+                    <label for="creaated_by">Admin</label>
+                    <input asp-for="created_by" class="form-control" rows="3" placeholder="Enter Admin's name"></input>
+                </div> *@
+            </div>
+
+            <!-- Created Info -->
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="created_at">Created At</label>
+                    <input asp-for="created_at" class="form-control" />
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="created_by">Admin</label>
+                    <input asp-for="created_by" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="updated_at">Updated At</label>
+                <input asp-for="updated_at" class="form-control" />
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-group text-center">
+                <button type="submit" form="addRequestForm" class="btn btn-primary">Save Request</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section scripts {
+    @* <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Ensure both elements are loaded
+            const categoryDropdown = document.getElementById('category');
+            const deviceDropdown = document.getElementById('deviceDropdown');
+
+            categoryDropdown.addEventListener('change', function () {
+                const id_category = this.value;
+                // console.log('Category ID selected:', id_category);
+
+                // Check if category is selected
+                if (id_category) {
+                    fetch(`/Transaction/GetDevicesByCategory?id_category=${id_category}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            // console.log('Device data:', data);
+                            // Clear previous options and add placeholder
+                            deviceDropdown.innerHTML = '<option value="">Select Device</option>';
+
+                            // Populate new options based on fetched data
+                            data.forEach(device => {
+                                const option = document.createElement('option');
+                                option.value = device.id_detail;
+                                option.textContent = device.display;
+                                // console.log(device.display);
+                                deviceDropdown.appendChild(option);
+                            });
+                        })
+                        .catch(error => console.error('Error fetching devices:', error));
+                } else {
+                    // Clear device dropdown if no category is selected
+                    deviceDropdown.innerHTML = '<option value="">Select Device</option>';
+                }
+            });
+        });
+    </script> *@
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const deviceTypeDropdown = document.getElementById('deviceType');
+            const deviceDropdown = document.getElementById('deviceDropdown');
+
+            deviceTypeDropdown.addEventListener('change', function () {
+                const selectedType = this.value;
+
+                // Ensure type is selected
+                if (selectedType) {
+                    fetch(`/Transaction/GetDevicesByType?deviceTypes=${selectedType}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            // console.log('Device data:', data);
+
+                            // Clear the device dropdown and add the placeholder
+                            deviceDropdown.innerHTML = '<option value="">Select Device</option>';
+
+                            // Populate the device dropdown with filtered data
+                            data.forEach(device => {
+                                const option = document.createElement('option');
+                                option.value = device.id_detail;
+                                option.textContent = device.display;
+                                deviceDropdown.appendChild(option);
+                            });
+                        })
+                        .catch(error => console.error('Error fetching devices:', error));
+                } else {
+                    // Clear device dropdown if no type is selected
+                    deviceDropdown.innerHTML = '<option value="">Select Device</option>';
+                }
+            });
+        });
+    </script>
+    <script>
+        document.getElementById("addRequestForm").addEventListener("submit", function (e) {
+            const requestNPP = document.getElementById("request_npp").value;
+            const requestName = document.getElementById("request_name").value;
+            const device = document.getElementById("deviceDropdown").selectedOptions[0].textContent;
+            const createdBy = document.getElementById("created_by").value;
+
+            if (!confirm(`Requesting device ${device} by ${requestNPP} - ${requestName}, under responsibility of ${createdBy}. Proceed?`)) {
+                e.preventDefault();
+            }
+        });
+
+    </script>
+}
